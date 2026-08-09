@@ -40,8 +40,7 @@ services:
       VOJ_MAIL_PASSWORD: ${VOJ_MAIL_PASSWORD:-}
       VOJ_MAIL_SENDER: ${VOJ_MAIL_SENDER:-noreply@example.com}
     volumes:
-      # /var/lib/mariadb is the MariaDB data directory in the image's Ubuntu base
-      # (Ubuntu moved it there from the traditional /var/lib/mysql).
+      # Docker seeds this named volume from the image's bundled database on first use.
       - voj-db:/var/lib/mariadb
     networks:
       default:
@@ -62,6 +61,8 @@ services:
       # Must match the web service. Everything else (DB host, broker, web base URL)
       # defaults to "voj.web" in the image, resolved via the alias above.
       VOJ_JUDGER_API_TOKEN: ${VOJ_JUDGER_API_TOKEN:-verwandlung}
+      VOJ_JUDGER_USERNAME: ${VOJ_JUDGER_USERNAME:-judge-alpha}
+      VOJ_JUDGER_PASSWORD: ${VOJ_JUDGER_PASSWORD:-judge-alpha}
 
 volumes:
   voj-db:
