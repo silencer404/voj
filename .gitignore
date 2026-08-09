@@ -3,6 +3,21 @@ bin/
 logs/
 cache/
 
+# Python
+__pycache__/
+*.pyc
+
+# Local MariaDB data from legacy bind-mount deployments
+/voj-db/
+
+# Local problem import data and Claude runtime state
+/.claude/
+/authorization.json
+/authorization.txt
+/backups/
+/problem-pipeline-*/
+/problem_mapping.json
+
 # Maven
 target/
 pom.xml.tag

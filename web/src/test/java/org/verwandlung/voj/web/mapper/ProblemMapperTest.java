@@ -244,6 +244,53 @@ public class ProblemMapperTest {
     Assertions.assertEquals(0, numberOfRowsAffected);
   }
 
+  @Test
+  public void testImportedProblemProvenanceIsUniqueAndUpdatable() {
+    Problem imported = importedProblem("P00456", "a".repeat(64));
+    Assertions.assertEquals(1, problemMapper.createImportedProblem(imported));
+
+    Problem persisted =
+        problemMapper.getProblemUsingProvenanceForUpdate("hydro", "hwod_oj", "P00456");
+    Assertions.assertNotNull(persisted);
+    Assertions.assertEquals(imported.getProblemId(), persisted.getProblemId());
+    Assertions.assertEquals("a".repeat(64), persisted.getContentSha256());
+
+    Problem duplicate = importedProblem("P00456", "b".repeat(64));
+    Assertions.assertThrows(
+        org.springframework.dao.DuplicateKeyException.class,
+        () -> problemMapper.createImportedProblem(duplicate));
+
+    persisted.setProblemName("Updated imported problem");
+    persisted.setContentSha256("b".repeat(64));
+    Assertions.assertEquals(1, problemMapper.updateImportedProblem(persisted));
+    Problem updated =
+        problemMapper.getProblemUsingProvenance("hydro", "hwod_oj", "P00456");
+    Assertions.assertEquals(persisted.getProblemId(), updated.getProblemId());
+    Assertions.assertEquals("Updated imported problem", updated.getProblemName());
+    Assertions.assertEquals("b".repeat(64), updated.getContentSha256());
+  }
+
+  private Problem importedProblem(String sourceId, String digest) {
+    Problem problem =
+        new Problem(
+            "DRAFT",
+            "Imported problem",
+            1000,
+            262144,
+            "Description",
+            "Input Format",
+            "Output Format",
+            "Sample Input",
+            "Sample Output",
+            "");
+    problem.setProblemDifficulty(new ProblemDifficulty(1, "easy", "Easy"));
+    problem.setSourceSystem("hydro");
+    problem.setSourceDomain("hwod_oj");
+    problem.setSourceId(sourceId);
+    problem.setContentSha256(digest);
+    return problem;
+  }
+
   /** Test case: tests the deleteProblem(long) method. Test data: the unique identifier of problem #1002. Expected: the data deletion operation completes successfully. */
   @Test
   public void testDeleteProblemExists() {

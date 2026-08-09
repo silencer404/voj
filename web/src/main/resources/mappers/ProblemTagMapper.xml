@@ -64,7 +64,16 @@
 		INSERT INTO voj_problem_tags (problem_tag_slug, problem_tag_name) 
 		VALUES (#{problemTagSlug}, #{problemTagName})
 	</insert>
-	<insert id="createProblemTagRelationship" 
+	<insert id="createImportedProblemTag"
+		parameterType="org.verwandlung.voj.web.model.ProblemTag"
+		keyProperty="problemTagId"
+		keyColumn="problem_tag_id"
+		useGeneratedKeys="true">
+		INSERT INTO voj_problem_tags (problem_tag_slug, problem_tag_name)
+		VALUES (#{problemTagSlug}, #{problemTagName})
+		ON DUPLICATE KEY UPDATE problem_tag_id = LAST_INSERT_ID(problem_tag_id)
+	</insert>
+	<insert id="createProblemTagRelationship"
 		parameterType="map">
 		INSERT INTO voj_problem_tag_relationships (problem_id, problem_tag_id) 
 		VALUES (#{problemId}, #{problemTag.problemTagId})

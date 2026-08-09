@@ -85,6 +85,18 @@ public interface ProblemMapper {
    */
   Problem getProblem(@Param("problemId") long problemId);
 
+  Problem getProblemForUpdate(@Param("problemId") long problemId);
+
+  Problem getProblemUsingProvenance(
+      @Param("sourceSystem") String sourceSystem,
+      @Param("sourceDomain") String sourceDomain,
+      @Param("sourceId") String sourceId);
+
+  Problem getProblemUsingProvenanceForUpdate(
+      @Param("sourceSystem") String sourceSystem,
+      @Param("sourceDomain") String sourceDomain,
+      @Param("sourceId") String sourceId);
+
   /**
    * Gets all problems within a range by problem identifier and keyword.
    *
@@ -152,6 +164,12 @@ public interface ProblemMapper {
    */
   int createProblem(Problem problem);
 
+  int createImportedProblem(Problem problem);
+
+  String getSessionSqlMode();
+
+  int setSessionSqlMode(@Param("sqlMode") String sqlMode);
+
   /**
    * Updates problem information.
    *
@@ -159,6 +177,8 @@ public interface ProblemMapper {
    * @return whether the operation completed successfully
    */
   int updateProblem(Problem problem);
+
+  int updateImportedProblem(Problem problem);
 
   /**
    * Deletes a problem object by its unique identifier.

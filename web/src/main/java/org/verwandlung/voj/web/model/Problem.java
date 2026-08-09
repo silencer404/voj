@@ -126,8 +126,39 @@ public class Problem implements Serializable {
     this.problemId = problemId;
   }
 
-  /**
-   * Gets the publication status of the problem (PUBLISHED / DRAFT / HIDDEN).
+  public String getSourceSystem() {
+    return sourceSystem;
+  }
+
+  public void setSourceSystem(String sourceSystem) {
+    this.sourceSystem = sourceSystem;
+  }
+
+  public String getSourceDomain() {
+    return sourceDomain;
+  }
+
+  public void setSourceDomain(String sourceDomain) {
+    this.sourceDomain = sourceDomain;
+  }
+
+  public String getSourceId() {
+    return sourceId;
+  }
+
+  public void setSourceId(String sourceId) {
+    this.sourceId = sourceId;
+  }
+
+  public String getContentSha256() {
+    return contentSha256;
+  }
+
+  public void setContentSha256(String contentSha256) {
+    this.contentSha256 = contentSha256;
+  }
+
+  /** Gets the publication status of the problem (PUBLISHED / DRAFT / HIDDEN).
    *
    * @return the publication status of the problem
    */
@@ -419,6 +450,11 @@ public class Problem implements Serializable {
 
   /** The publication status of the problem (PUBLISHED / DRAFT / HIDDEN). */
   private String status = PublicationStatus.PUBLISHED;
+
+  private String sourceSystem;
+  private String sourceDomain;
+  private String sourceId;
+  private String contentSha256;
 
   /** The name of the problem. */
   private String problemName;

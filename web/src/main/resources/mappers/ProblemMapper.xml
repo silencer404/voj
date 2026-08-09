@@ -18,6 +18,10 @@
 		<result property="sampleInput" column="problem_sample_input" />
 		<result property="sampleOutput" column="problem_sample_output" />
 		<result property="hint" column="problem_hint" />
+		<result property="sourceSystem" column="problem_source_system" />
+		<result property="sourceDomain" column="problem_source_domain" />
+		<result property="sourceId" column="problem_source_id" />
+		<result property="contentSha256" column="problem_content_sha256" />
 		<association property="problemDifficulty" javaType="org.verwandlung.voj.web.model.ProblemDifficulty">
 			<id property="problemDifficultyId" column="problem_difficulty_id" />
 			<result property="problemDifficultySlug" column="problem_difficulty_slug" />
@@ -92,6 +96,36 @@
 		FROM voj_problems p
 		LEFT JOIN voj_problem_difficulty d ON d.problem_difficulty_id = p.problem_difficulty_id
 		WHERE p.problem_id = #{problemId}
+	</select>
+	<select id="getProblemForUpdate"
+		parameterType="long"
+		resultMap="ProblemResultMap">
+		SELECT p.*, d.problem_difficulty_slug, d.problem_difficulty_name
+		FROM voj_problems p
+		LEFT JOIN voj_problem_difficulty d ON d.problem_difficulty_id = p.problem_difficulty_id
+		WHERE p.problem_id = #{problemId}
+		FOR UPDATE
+	</select>
+	<select id="getProblemUsingProvenance"
+		parameterType="map"
+		resultMap="ProblemResultMap">
+		SELECT p.*, d.problem_difficulty_slug, d.problem_difficulty_name
+		FROM voj_problems p
+		LEFT JOIN voj_problem_difficulty d ON d.problem_difficulty_id = p.problem_difficulty_id
+		WHERE p.problem_source_system = #{sourceSystem}
+			AND p.problem_source_domain = #{sourceDomain}
+			AND p.problem_source_id = #{sourceId}
+	</select>
+	<select id="getProblemUsingProvenanceForUpdate"
+		parameterType="map"
+		resultMap="ProblemResultMap">
+		SELECT p.*, d.problem_difficulty_slug, d.problem_difficulty_name
+		FROM voj_problems p
+		LEFT JOIN voj_problem_difficulty d ON d.problem_difficulty_id = p.problem_difficulty_id
+		WHERE p.problem_source_system = #{sourceSystem}
+			AND p.problem_source_domain = #{sourceDomain}
+			AND p.problem_source_id = #{sourceId}
+		FOR UPDATE
 	</select>
 	<!-- Page-based listing for the public problem set (numbered pager + ID/Title/Tag filter). -->
 	<select id="getNumberOfProblemsByPage"
@@ -204,11 +238,31 @@
 		INSERT INTO voj_problems (problem_status, problem_name, problem_difficulty_id, problem_time_limit, problem_memory_limit, problem_description, problem_input_format, problem_output_format, problem_sample_input, problem_sample_output, problem_hint)
 		VALUES (#{status}, #{problemName}, #{problemDifficulty.problemDifficultyId}, #{timeLimit}, #{memoryLimit}, #{description}, #{inputFormat}, #{outputFormat}, #{sampleInput}, #{sampleOutput}, #{hint})
 	</insert>
+	<select id="getSessionSqlMode" resultType="string">
+		SELECT @@SESSION.sql_mode
+	</select>
+	<update id="setSessionSqlMode" parameterType="string">
+		SET SESSION sql_mode = #{sqlMode}
+	</update>
+	<insert id="createImportedProblem"
+		parameterType="org.verwandlung.voj.web.model.Problem">
+		INSERT INTO voj_problems (problem_id, problem_status, problem_name, problem_difficulty_id, problem_time_limit, problem_memory_limit, problem_description, problem_input_format, problem_output_format, problem_sample_input, problem_sample_output, problem_hint, problem_source_system, problem_source_domain, problem_source_id, problem_content_sha256)
+		VALUES (#{problemId}, #{status}, #{problemName}, #{problemDifficulty.problemDifficultyId}, #{timeLimit}, #{memoryLimit}, #{description}, #{inputFormat}, #{outputFormat}, #{sampleInput}, #{sampleOutput}, #{hint}, #{sourceSystem}, #{sourceDomain}, #{sourceId}, #{contentSha256})
+	</insert>
 	<update id="updateProblem"
 		parameterType="org.verwandlung.voj.web.model.Problem">
 		UPDATE voj_problems 
 		SET problem_status = #{status}, problem_name = #{problemName}, problem_difficulty_id = #{problemDifficulty.problemDifficultyId}, problem_time_limit = #{timeLimit}, problem_memory_limit = #{memoryLimit}, problem_description = #{description}, problem_input_format = #{inputFormat}, problem_output_format = #{outputFormat}, problem_sample_input = #{sampleInput}, problem_sample_output = #{sampleOutput}, problem_hint = #{hint} 
 		WHERE problem_id = #{problemId}
+	</update>
+	<update id="updateImportedProblem"
+		parameterType="org.verwandlung.voj.web.model.Problem">
+		UPDATE voj_problems
+		SET problem_status = #{status}, problem_name = #{problemName}, problem_difficulty_id = #{problemDifficulty.problemDifficultyId}, problem_time_limit = #{timeLimit}, problem_memory_limit = #{memoryLimit}, problem_description = #{description}, problem_input_format = #{inputFormat}, problem_output_format = #{outputFormat}, problem_sample_input = #{sampleInput}, problem_sample_output = #{sampleOutput}, problem_hint = #{hint}, problem_content_sha256 = #{contentSha256}
+		WHERE problem_id = #{problemId}
+			AND problem_source_system = #{sourceSystem}
+			AND problem_source_domain = #{sourceDomain}
+			AND problem_source_id = #{sourceId}
 	</update>
 	<delete id="deleteProblem"
 		parameterType="long">

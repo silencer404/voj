@@ -77,6 +77,8 @@ public interface ProblemTagMapper {
    */
   int createProblemTag(ProblemTag problemTag);
 
+  int createImportedProblemTag(ProblemTag problemTag);
+
   /**
    * Creates the relationship between a problem and a problem tag.
    *

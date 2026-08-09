@@ -153,6 +153,10 @@ CREATE TABLE `voj_problems` (
   `problem_sample_input` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `problem_sample_output` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `problem_hint` text COLLATE utf8mb4_unicode_ci,
+  `problem_source_system` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `problem_source_domain` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `problem_source_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `problem_content_sha256` char(64) COLLATE ascii_bin DEFAULT NULL,
   `checkpoints_version` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -291,7 +295,8 @@ ALTER TABLE `voj_options`
   ADD UNIQUE KEY `option_name` (`option_name`);
 
 ALTER TABLE `voj_problems`
-  ADD PRIMARY KEY (`problem_id`);
+  ADD PRIMARY KEY (`problem_id`),
+  ADD UNIQUE KEY `problem_provenance` (`problem_source_system`,`problem_source_domain`,`problem_source_id`);
 
 ALTER TABLE `voj_problem_categories`
   ADD PRIMARY KEY (`problem_category_id`),

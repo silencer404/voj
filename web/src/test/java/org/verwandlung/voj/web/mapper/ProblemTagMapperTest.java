@@ -183,6 +183,21 @@ public class ProblemTagMapperTest {
     Assertions.assertThrows(org.springframework.dao.DuplicateKeyException.class, e);
   }
 
+  @Test
+  public void testCreateImportedProblemTagReturnsExistingIdOnDuplicateSlug() {
+    ProblemTag first = new ProblemTag("imported-tag", "Imported Tag");
+    ProblemTag duplicate = new ProblemTag("imported-tag", "Different Name");
+
+    Assertions.assertEquals(1, problemTagMapper.createImportedProblemTag(first));
+    Assertions.assertTrue(first.getProblemTagId() > 0);
+    problemTagMapper.createImportedProblemTag(duplicate);
+
+    Assertions.assertEquals(first.getProblemTagId(), duplicate.getProblemTagId());
+    Assertions.assertEquals(
+        "Imported Tag",
+        problemTagMapper.getProblemTagUsingTagSlug("imported-tag").getProblemTagName());
+  }
+
   /** Test case: tests the updateProblemTag(ProblemTag) method. Test data: a valid data set, and a corresponding record exists in the database. Expected: the data update operation completes successfully. */
   @Test
   public void testUpdateProblemTagNormally() {

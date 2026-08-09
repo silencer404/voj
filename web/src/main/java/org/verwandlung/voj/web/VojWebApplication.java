@@ -21,7 +21,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.PropertySource;
+
+import org.verwandlung.voj.web.model.ProblemImportReport;
+import org.verwandlung.voj.web.service.ProblemImportCommand;
 
 /**
  * The entry point of the web application of Verwandlung Online Judge.
@@ -36,8 +40,21 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource("classpath:voj.properties")
 public class VojWebApplication extends SpringBootServletInitializer {
   /** The entry point of the application. */
-  public static void main(String[] args) {
-    SpringApplication.run(VojWebApplication.class, args);
+  public static void main(String[] args) throws Exception {
+    if (!ProblemImportMode.requested(args)) {
+      SpringApplication.run(VojWebApplication.class, args);
+      return;
+    }
+    SpringApplication application = new SpringApplication(VojWebApplication.class);
+    application.setWebApplicationType(org.springframework.boot.WebApplicationType.NONE);
+    try (ConfigurableApplicationContext context = application.run(args)) {
+      ProblemImportCommand command = context.getBean(ProblemImportCommand.class);
+      ProblemImportReport report =
+          command.importPlan(
+              ProblemImportMode.planPath(args), ProblemImportMode.mappingPath(args));
+      System.out.println(command.toJson(report));
+    }
+    System.exit(ProblemImportMode.successExitCode());
   }
 
   /* (non-Javadoc)

@@ -7,6 +7,17 @@ appveyor.yml
 # Build artifacts
 **/target
 
+# Runtime data
+voj-db
+
+# Local problem import data and Claude runtime state
+.claude
+authorization.json
+authorization.txt
+backups
+problem-pipeline-*
+problem_mapping.json
+
 # Editor / OS noise
 **/.idea
 **/*.iml

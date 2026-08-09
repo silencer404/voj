@@ -53,6 +53,19 @@ docker compose up -d` (or re-running `run-docker.sh` with a newer image) keeps
 your data. The judger's downloaded test-data cache is not persisted — it is
 re-fetched from the web app on demand.
 
+Existing volumes must be upgraded before using the problem import command. Apply
+the idempotent provenance schema migration once with a database administrator
+account after pulling an image that contains this feature:
+
+```
+docker exec -it <web-container> mysql -u root -p voj
+MariaDB [voj]> source /root/voj/sql/migrations/001_problem_provenance.sql;
+```
+
+Migration `002_problem_identity_mapping.sql` is intentionally not automatic: it
+only applies to the guarded three-problem remapping described in that file and
+must be reviewed before an administrator runs it.
+
 > The bundled, single-container MariaDB is convenient but ties the database to the
 > web container. For a larger or backup-friendly deployment, point `VOJ_DB_*` at a
 > database you manage instead (the bundled one is then unused).
